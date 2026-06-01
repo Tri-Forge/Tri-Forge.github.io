@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRIFORGE | Digital Collective</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#09090b;
+  --bg2:#0f0f12;
+  --bg3:#141418;
+  --purple:#8b5cf6;
+  --purple2:#6d28d9;
+  --purple3:#a78bfa;
+  --silver:#e5e7eb;
+  --silver2:#9ca3af;
+  --silver3:#6b7280;
+  --border:rgba(139,92,246,0.2);
+  --border2:rgba(139,92,246,0.4);
+  --glow:rgba(139,92,246,0.3);
+  --glow2:rgba(139,92,246,0.6);
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--silver);
+  font-family:'Syne',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CURSOR */
+#cur,#cur-trail{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cur{width:8px;height:8px;background:var(--purple3);box-shadow:0 0 12px var(--purple),0 0 24px var(--purple);}
+#cur-trail{width:36px;height:36px;border:1px solid rgba(139,92,246,0.5);transition:all .12s ease-out;}
+
+/* PARTICLES */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.p{position:absolute;border-radius:50%;animation:float linear infinite;}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:.4;}100%{transform:translateY(-10vh) scale(1);opacity:0;}}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");opacity:.4;z-index:1;pointer-events:none;}
+
+/* NAVBAR */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;
+  background:rgba(9,9,11,0.8);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;}
+.nav-brand img{width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);box-shadow:0 0 16px var(--glow);}
+.nav-brand-name{font-family:'Orbitron',monospace;font-size:.95rem;font-weight:900;letter-spacing:.25em;color:var(--silver);text-shadow:0 0 12px var(--purple);}
+.nav-links{display:flex;gap:2rem;list-style:none;}
+.nav-links a{font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--silver2);text-decoration:none;transition:.2s;cursor:none;}
+.nav-links a:hover{color:var(--purple3);text-shadow:0 0 10px var(--glow2);}
+.nav-cta{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.55rem 1.2rem;font-size:.75rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;cursor:none;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border-radius:8px;color:#fff;
+  box-shadow:0 0 20px var(--glow);
+  transition:.3s;
+}
+.nav-cta:hover{box-shadow:0 0 35px var(--glow2);transform:translateY(-1px);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.5rem;}
+.hamburger span{display:block;width:24px;height:2px;background:var(--silver);border-radius:2px;transition:.3s;}
+.mobile-menu{display:none;position:fixed;inset:0;top:65px;background:rgba(9,9,11,.97);backdrop-filter:blur(20px);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:1.5rem;font-weight:700;letter-spacing:.15em;color:var(--silver);text-decoration:none;text-transform:uppercase;cursor:none;}
+
+/* HERO */
+.hero{
+  position:relative;z-index:2;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:6rem 2rem 4rem;
+  overflow:hidden;
+}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(109,40,217,0.15) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.4rem 1rem;border-radius:100px;
+  border:1px solid var(--border2);background:rgba(139,92,246,0.08);
+  font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--purple3);
+  margin-bottom:2rem;animation:fadeUp .8s ease both;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#23d18b;box-shadow:0 0 8px #23d18b;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.hero-title{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(4.5rem,15vw,11rem);
+  font-weight:900;letter-spacing:-.01em;
+  line-height:.9;
+  background:linear-gradient(135deg,#e5e7eb 0%,var(--purple3) 40%,#c4b5fd 60%,var(--silver) 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:titleGrad 4s ease infinite,fadeUp .8s .2s ease both;
+  text-shadow:none;
+  filter:drop-shadow(0 0 40px rgba(139,92,246,0.4));
+}
+@keyframes titleGrad{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+.hero-sub{
+  font-size:clamp(.9rem,2.5vw,1.15rem);font-weight:600;
+  letter-spacing:.35em;text-transform:uppercase;color:var(--silver2);
+  margin-top:1.5rem;margin-bottom:3rem;
+  animation:fadeUp .8s .4s ease both;
+}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .8s .6s ease both;}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:1rem 2.2rem;font-size:.85rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;cursor:none;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border:1px solid var(--purple);border-radius:10px;color:#fff;
+  box-shadow:0 0 30px var(--glow),inset 0 1px 0 rgba(255,255,255,.1);
+  transition:.3s;position:relative;overflow:hidden;
+}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:.3s;}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 40px var(--glow2);}
+.btn-primary:hover::after{opacity:1;}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:1rem 2.2rem;font-size:.85rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;cursor:none;
+  background:transparent;border:1px solid var(--border2);border-radius:10px;color:var(--silver);
+  transition:.3s;
+}
+.btn-secondary:hover{border-color:var(--purple3);color:var(--purple3);box-shadow:0 0 20px var(--glow);transform:translateY(-3px);}
+.hero-line{
+  width:1px;height:80px;
+  background:linear-gradient(to bottom,transparent,var(--purple),transparent);
+  margin:4rem auto 0;
+  animation:fadeUp .8s .8s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTION COMMONS */
+section{position:relative;z-index:2;}
+.section-wrap{max-width:1200px;margin:0 auto;padding:0 2rem;}
+.section-tag{
+  display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--purple3);margin-bottom:.75rem;
+  padding:.3rem .8rem;border:1px solid var(--border2);border-radius:4px;background:rgba(139,92,246,.06);
+}
+.section-title{
+  font-family:'Orbitron',monospace;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;
+  letter-spacing:.05em;color:var(--silver);margin-bottom:1rem;
+  text-shadow:0 0 30px var(--glow);
+}
+.section-desc{font-size:1rem;color:var(--silver2);line-height:1.7;max-width:600px;}
+
+/* REVEAL ANIMATION */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:none;}
+
+/* DIVIDER */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0;}
+
+/* STATS SECTION */
+.stats-section{padding:5rem 0;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;}
+.stat-card{
+  background:rgba(139,92,246,.05);
+  border:1px solid var(--border);border-radius:16px;
+  padding:2rem;text-align:center;
+  transition:.3s;position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(139,92,246,.08),transparent);opacity:0;transition:.3s;}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 8px 30px var(--glow);}
+.stat-card:hover::before{opacity:1;}
+.stat-icon{font-size:2rem;margin-bottom:.75rem;}
+.stat-num{
+  font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--purple3);
+  display:block;margin-bottom:.25rem;
+  text-shadow:0 0 15px var(--glow2);
+}
+.stat-label{font-size:.75rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--silver2);}
+.stat-live{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;letter-spacing:.1em;color:#23d18b;margin-top:.5rem;text-transform:uppercase;}
+.stat-live-dot{width:5px;height:5px;border-radius:50%;background:#23d18b;animation:pulse 1.5s infinite;}
+
+/* TEAM SECTION */
+.team-section{padding:6rem 0;}
+.team-header{margin-bottom:4rem;}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:2rem;}
+.member-card{
+  background:var(--bg2);
+  border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;transition:.4s cubic-bezier(.175,.885,.32,1.275);
+  position:relative;cursor:none;
+  min-height:560px; /* Tall card for cinematic photo */
+  display:flex;align-items:flex-end;
+}
+.member-card::before{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:3px;
+  background:linear-gradient(90deg,transparent,var(--purple3),transparent);
+  transition:.6s ease;z-index:3;
+}
+.member-card:hover::before{left:100%;}
+.member-card:hover{transform:translateY(-8px);border-color:var(--border2);box-shadow:0 20px 50px rgba(139,92,246,.2);}
+.member-photo{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  z-index:0;transition:transform .7s ease, filter .4s ease;
+  filter:brightness(0.5) contrast(1.1) saturate(0.8);
+}
+.member-card:hover .member-photo{
+  transform:scale(1.06);
+  filter:brightness(0.8) contrast(1.1) saturate(1.1);
+}
+.member-body{
+  position:relative;z-index:1;width:100%;
+  padding:4rem 2rem 2rem;
+  background:linear-gradient(to top, rgba(9,9,11,1) 0%, rgba(9,9,11,0.95) 40%, rgba(9,9,11,0.4) 80%, transparent 100%);
+}
+.member-name{
+  font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:900;
+  color:var(--silver);letter-spacing:.05em;margin-bottom:.25rem;
+  text-shadow:0 0 15px rgba(0,0,0,0.8);
+}
+.member-role{font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--purple3);margin-bottom:1.25rem; text-shadow: 0 0 10px rgba(0,0,0,0.8);}
+.member-desc{font-size:.85rem;color:var(--silver);line-height:1.7;margin-bottom:1.5rem; opacity: 0.9;}
+.services-title{font-size:.65rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--silver2);margin-bottom:.75rem;}
+.services-wrap{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.75rem;}
+.service-tag{
+  font-size:.65rem;font-weight:600;letter-spacing:.05em;
+  padding:.25rem .65rem;border-radius:6px;
+  background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);
+  color:var(--silver);backdrop-filter: blur(4px);
+  transition:.2s;
+}
+.service-tag:hover{background:rgba(139,92,246,.3);color:#fff;border-color:var(--purple3);}
+.portfolio-link{
+  display:block;width:100%;padding:.8rem;text-align:center;
+  font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  text-decoration:none;cursor:none;
+  border:1px solid rgba(139,92,246,.4);border-radius:10px;color:var(--silver);
+  background:rgba(0,0,0,.4);backdrop-filter: blur(8px);
+  transition:.3s;position:relative;overflow:hidden;
+}
+.portfolio-link::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--purple),var(--purple2));opacity:0;transition:.3s;}
+.portfolio-link span{position:relative;z-index:1;}
+.portfolio-link:hover::after{opacity:1;}
+.portfolio-link:hover{border-color:var(--purple);color:#fff;box-shadow:0 0 25px var(--glow);}
+
+/* ABOUT SECTION */
+.about-section{padding:6rem 0;}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.about-visual{
+  position:relative;
+}
+.about-logo-wrap{
+  width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  background:rgba(139,92,246,.05);border:1px solid var(--border);border-radius:24px;
+  position:relative;overflow:hidden;
+}
+.about-logo-wrap::before{
+  content:'';position:absolute;inset:-50%;
+  background:conic-gradient(from 0deg,transparent,var(--purple),transparent 30%);
+  animation:rotateGlow 8s linear infinite;opacity:.12;
+}
+@keyframes rotateGlow{100%{transform:rotate(360deg);}}
+.about-logo-wrap img{width:70%;height:70%;object-fit:contain;position:relative;z-index:1;filter:drop-shadow(0 0 30px var(--glow2));}
+.about-content .section-tag{margin-bottom:1rem;}
+.about-content .section-title{margin-bottom:1.5rem;}
+.about-content .section-desc{margin-bottom:2rem;}
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.feature-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.75rem 1rem;border-radius:10px;
+  background:rgba(139,92,246,.05);border:1px solid var(--border);
+  font-size:.8rem;font-weight:600;color:var(--silver2);
+  transition:.2s;
+}
+.feature-item:hover{border-color:var(--border2);color:var(--purple3);}
+.feature-icon{font-size:1.1rem;}
+
+/* COMMUNITY SECTION */
+.community-section{padding:7rem 0;}
+.community-inner{
+  background:linear-gradient(135deg,rgba(109,40,217,.12),rgba(139,92,246,.05));
+  border:1px solid var(--border2);border-radius:24px;
+  padding:5rem 3rem;text-align:center;
+  position:relative;overflow:hidden;
+}
+.community-inner::before{
+  content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+  width:600px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.2),transparent 70%);
+  pointer-events:none;
+}
+.community-logos{display:flex;align-items:center;justify-content:center;gap:2rem;margin-bottom:2rem;position:relative;z-index:1;}
+.community-logos img{width:80px;height:80px;border-radius:16px;border:1px solid var(--border2);box-shadow:0 0 25px var(--glow);}
+.community-logos .logo-sep{width:1px;height:50px;background:linear-gradient(to bottom,transparent,var(--border2),transparent);}
+.discord-logo-svg{width:70px;height:70px;fill:#5865F2;filter:drop-shadow(0 0 15px rgba(88,101,242,.5));}
+.community-title{
+  font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;
+  color:var(--silver);margin-bottom:1rem;position:relative;z-index:1;
+  text-shadow:0 0 20px rgba(255,255,255,.2);
+}
+.community-desc{font-size:1rem;color:var(--silver2);line-height:1.7;max-width:500px;margin:0 auto 2.5rem;position:relative;z-index:1;}
+.community-btn{
+  display:inline-flex;align-items:center;gap:.75rem;
+  padding:1.1rem 2.8rem;font-size:.9rem;font-weight:700;letter-spacing:.15em;
+  text-transform:uppercase;text-decoration:none;cursor:none;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border:1px solid var(--purple3);border-radius:12px;color:#fff;
+  box-shadow:0 0 40px var(--glow2);transition:.3s;position:relative;z-index:1;
+}
+.community-btn:hover{transform:translateY(-4px);box-shadow:0 12px 50px var(--glow2);}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:2;
+  border-top:1px solid var(--border);
+  padding:2.5rem;
+  background:rgba(9,9,11,.95);
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.footer-brand{display:flex;align-items:center;gap:.75rem;font-family:'Orbitron',monospace;font-size:.85rem;font-weight:900;letter-spacing:.2em;color:var(--silver);}
+.footer-brand img{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);}
+.footer-info{text-align:center;font-size:.7rem;color:var(--silver3);letter-spacing:.1em;line-height:1.8;}
+.footer-info strong{color:var(--silver2);}
+.footer-right{font-size:.7rem;color:var(--silver3);letter-spacing:.1em;text-align:right;}
+
+/* MOBILE */
+@media(max-width:900px){
+  .about-grid{grid-template-columns:1fr;}
+  .about-visual{display:none;}
+}
+@media(max-width:768px){
+  nav{padding:.85rem 1.25rem;}
+  .nav-links,.nav-cta{display:none;}
+  .hamburger{display:flex;}
+  .hero{padding:5rem 1.25rem 3rem;}
+  .section-wrap{padding:0 1.25rem;}
+  .team-grid{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .community-inner{padding:3rem 1.5rem;}
+  .footer-inner{flex-direction:column;text-align:center;}
+  .footer-right{text-align:center;}
+  .features-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-trail"></div>
+<div id="particles"></div>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <img src="https://i.imgur.com/frtDge5.jpeg" alt="TriForge"/>
+    <span class="nav-brand-name">TRIFORGE</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#community">Community</a></li>
+  </ul>
+  <a class="nav-cta" href="https://discord.gg/V84EycNkCa" target="_blank">
+    <svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+    Join Discord
+  </a>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#home" onclick="toggleMenu()">Home</a>
+  <a href="#team" onclick="toggleMenu()">Team</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#community" onclick="toggleMenu()">Community</a>
+  <a href="https://discord.gg/V84EycNkCa" target="_blank" style="color:var(--purple3);">Join Discord</a>
+</div>
+
+<section id="home" class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-badge"><span class="badge-dot"></span> Digital Collective · Est. 2024</div>
+  <h1 class="hero-title">TRIFORGE</h1>
+  <p class="hero-sub">Developers &nbsp;·&nbsp; Designers &nbsp;·&nbsp; Creators</p>
+  <div class="hero-btns">
+    <a href="https://discord.gg/V84EycNkCa" target="_blank" class="btn-primary">
+      <svg width="16" height="12" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+      Join Discord
+    </a>
+    <a href="#team" class="btn-secondary">Learn More ↓</a>
+  </div>
+  <div class="hero-line"></div>
+</section>
+
+<div class="divider"></div>
+
+<section class="stats-section">
+  <div class="section-wrap">
+    <div class="stats-grid reveal">
+      <div class="stat-card">
+        <div class="stat-icon">🌐</div>
+        <span class="stat-num" id="server-name-stat">TRIFORGE</span>
+        <span class="stat-label">Server Name</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <span class="stat-num" id="online-count">—</span>
+        <span class="stat-label">Members Online</span>
+        <div class="stat-live"><span class="stat-live-dot"></span>Live Data</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔒</div>
+        <span class="stat-num" id="server-status">ONLINE</span>
+        <span class="stat-label">Server Status</span>
+        <div class="stat-live"><span class="stat-live-dot"></span>Active</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="team" class="team-section">
+  <div class="section-wrap">
+    <div class="team-header reveal">
+      <div class="section-tag">The Architects</div>
+      <h2 class="section-title">Meet The Team</h2>
+      <p class="section-desc">Three specialists, one collective. Every discipline covered under the TriForge banner.</p>
+    </div>
+    <div class="team-grid">
+
+      <div class="member-card reveal">
+        <img class="member-photo" src="https://i.imgur.com/kc7Qe36.jpeg" alt="Abhis" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Abhis'"/>
+        <div class="member-body">
+          <h3 class="member-name">Abhis</h3>
+          <div class="member-role">Creative Tech &amp; Digital Services</div>
+          <p class="member-desc">Elevating digital presence and streamlining workflows. A comprehensive suite of development, design, and optimization services engineered for peak performance.</p>
+          <div class="services-title">Services</div>
+          <div class="services-wrap">
+            <span class="service-tag">Discord Dev</span>
+            <span class="service-tag">Bot Development</span>
+            <span class="service-tag">Web Dev</span>
+            <span class="service-tag">Profile Pages</span>
+            <span class="service-tag">Link Pages</span>
+            <span class="service-tag">Thumbnail Design</span>
+            <span class="service-tag">PPT Design</span>
+            <span class="service-tag">Resume Design</span>
+            <span class="service-tag">PC Optimization</span>
+            <span class="service-tag">AI Automation</span>
+          </div>
+          <a href="https://shorturl.at/HOd9o" target="_blank" class="portfolio-link"><span>View Portfolio →</span></a>
+        </div>
+      </div>
+
+      <div class="member-card reveal">
+        <img class="member-photo" src="https://i.imgur.com/AAzbB8M.jpeg" alt="Charlie" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Charlie'"/>
+        <div class="member-body">
+          <h3 class="member-name">Charlie</h3>
+          <div class="member-role">Game Engineering &amp; Visual Production</div>
+          <p class="member-desc">Where code meets creativity. Building at the intersection of robust game engineering and high-energy visual production. Craft is the constant.</p>
+          <div class="services-title">Services</div>
+          <div class="services-wrap">
+            <span class="service-tag">Unity Dev</span>
+            <span class="service-tag">C#</span>
+            <span class="service-tag">Physics Systems</span>
+            <span class="service-tag">AI Behaviors</span>
+            <span class="service-tag">UI Systems</span>
+            <span class="service-tag">Video Editing</span>
+            <span class="service-tag">Motion Graphics</span>
+            <span class="service-tag">Premiere Pro</span>
+            <span class="service-tag">After Effects</span>
+          </div>
+          <a href="https://ofc-charlie.github.io/" target="_blank" class="portfolio-link"><span>View Portfolio →</span></a>
+        </div>
+      </div>
+
+      <div class="member-card reveal">
+        <img class="member-photo" src="https://i.imgur.com/Kj2eGmW.jpeg" alt="Sayeed" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Sayeed'"/>
+        <div class="member-body">
+          <h3 class="member-name">Sayeed</h3>
+          <div class="member-role">Premium GFX &amp; Visual Presence</div>
+          <p class="member-desc">Creator-ready graphics with a premium visual presence. Clean composition, sharp detail, and elite presentation that makes brand identity hit hard.</p>
+          <div class="services-title">Services</div>
+          <div class="services-wrap">
+            <span class="service-tag">Logo Design</span>
+            <span class="service-tag">Brand Identity</span>
+            <span class="service-tag">Banner Design</span>
+            <span class="service-tag">Header Design</span>
+            <span class="service-tag">Thumbnail Design</span>
+            <span class="service-tag">Artwork Creation</span>
+            <span class="service-tag">Poster Design</span>
+            <span class="service-tag">Social Media GFX</span>
+          </div>
+          <a href="https://user99999987.github.io/Sayeed-Portfolio/" target="_blank" class="portfolio-link"><span>View Portfolio →</span></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="about" class="about-section">
+  <div class="section-wrap">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-logo-wrap">
+          <img src="https://i.imgur.com/frtDge5.jpeg" alt="TriForge Logo"/>
+        </div>
+      </div>
+      <div class="about-content reveal">
+        <div class="section-tag">Our Story</div>
+        <h2 class="section-title">About TriForge</h2>
+        <p class="section-desc">TriForge is a collaborative community built by developers, designers and creators. Our goal is to help members learn, build, network and create amazing projects together.</p>
+        <p class="section-desc" style="margin-top:1rem;">Whether you are a programmer, gamer, editor, designer or entrepreneur, TriForge provides a place to grow your skills and connect with like-minded people.</p>
+        <div class="features-grid" style="margin-top:2rem;">
+          <div class="feature-item"><span class="feature-icon">💻</span> Development</div>
+          <div class="feature-item"><span class="feature-icon">🎨</span> Design</div>
+          <div class="feature-item"><span class="feature-icon">🎮</span> Gaming</div>
+          <div class="feature-item"><span class="feature-icon">🤝</span> Community</div>
+          <div class="feature-item"><span class="feature-icon">🤖</span> Automation</div>
+          <div class="feature-item"><span class="feature-icon">✨</span> Creative Services</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="community" class="community-section">
+  <div class="section-wrap">
+    <div class="community-inner reveal">
+      <div class="community-logos">
+        <img src="https://i.imgur.com/frtDge5.jpeg" alt="TriForge Logo"/>
+        <div class="logo-sep"></div>
+        <svg class="discord-logo-svg" viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+      </div>
+      <h2 class="community-title">Join The TriForge Community</h2>
+      <p class="community-desc">Connect with creators, developers and designers from around the world. Build something legendary together.</p>
+      <a href="https://discord.gg/V84EycNkCa" target="_blank" class="community-btn">
+        <svg width="20" height="15" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+        Join Server
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="https://i.imgur.com/frtDge5.jpeg" alt="TriForge"/>
+      TRIFORGE
+    </div>
+    <div class="footer-info">
+      <div>Built with passion by the <strong>TriForge Team</strong></div>
+      <div style="margin-top:.25rem;">Server ID: <strong>1503255333869715517</strong></div>
+    </div>
+    <div class="footer-right">
+      © 2026 TRIFORGE COLLECTIVE<br>
+      <span style="color:var(--silver3);">All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),trail=document.getElementById('cur-trail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function anim(){tx+=(mx-tx)*.15;ty+=(my-ty)*.15;trail.style.left=tx+'px';trail.style.top=ty+'px';requestAnimationFrame(anim);})();
+document.querySelectorAll('a,button,.member-card,.stat-card,.feature-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{trail.style.width='60px';trail.style.height='60px';trail.style.borderColor='var(--purple3)';});
+  el.addEventListener('mouseleave',()=>{trail.style.width='36px';trail.style.height='36px';trail.style.borderColor='rgba(139,92,246,.5)';});
+});
+
+// PARTICLES
+const pc=document.getElementById('particles');
+for(let i=0;i<40;i++){
+  const p=document.createElement('div');
+  p.className='p';
+  const sz=Math.random()*4+1;
+  const hue=Math.random()>0.5?'139,92,246':'167,139,250';
+  p.style.cssText=`
+    width:${sz}px;height:${sz}px;
+    left:${Math.random()*100}%;
+    background:rgba(${hue},${Math.random()*.6+.1});
+    box-shadow:0 0 ${sz*3}px rgba(${hue},.4);
+    animation-duration:${Math.random()*20+10}s;
+    animation-delay:-${Math.random()*20}s;
+  `;
+  pc.appendChild(p);
+}
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// MOBILE MENU
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// DISCORD LIVE DATA
+fetch('https://discord.com/api/guilds/1503255333869715517/widget.json')
+  .then(r=>r.json())
+  .then(data=>{
+    if(data){
+      if(data.name) document.getElementById('server-name-stat').textContent=data.name.toUpperCase();
+      if(data.presence_count!==undefined){
+        const el=document.getElementById('online-count');
+        let c=0,target=data.presence_count;
+        const t=setInterval(()=>{c+=Math.ceil(target/30);if(c>=target){c=target;clearInterval(t);}el.textContent=c;},40);
+      }
+      document.getElementById('server-status').textContent='ONLINE';
+    }
+  })
+  .catch(()=>{
+    document.getElementById('online-count').textContent='—';
+    document.getElementById('server-status').textContent='ACTIVE';
+  });
+</script>
+</body>
+</html>
